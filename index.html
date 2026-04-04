@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEERA STORE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Poppins,sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:#fff;
+}
+
+/* HEADER */
+header{
+  text-align:center;
+  padding:20px;
+  background:linear-gradient(90deg,#00c853,#000);
+}
+header h1{font-size:28px}
+header p{font-size:14px}
+
+/* FILTER */
+.filters{
+  display:flex;
+  overflow:auto;
+  gap:10px;
+  padding:10px;
+}
+.filters button{
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  background:#00c853;
+  color:#000;
+  cursor:pointer;
+}
+
+/* PRODUCTS */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:15px;
+  padding:15px;
+}
+.card{
+  background:#111;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 0 10px rgba(0,255,100,0.4);
+  transition:0.3s;
+}
+.card:hover{transform:scale(1.05)}
+.card img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+}
+.card .info{
+  padding:10px;
+}
+.card h3{font-size:14px}
+.card p{font-size:12px;color:#ccc}
+.price{color:#00e676;font-weight:bold}
+
+/* BUTTON */
+.add-btn{
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+  border:none;
+  background:#00c853;
+  cursor:pointer;
+}
+
+/* CART */
+.cart-icon{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#00c853;
+  color:#000;
+  padding:15px;
+  border-radius:50%;
+  cursor:pointer;
+}
+.cart-count{
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:3px 6px;
+  border-radius:50%;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+.modal-content{
+  background:#111;
+  padding:20px;
+  width:90%;
+  max-width:400px;
+  max-height:80%;
+  overflow:auto;
+}
+
+/* WHATSAPP */
+.whatsapp{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:#25d366;
+  padding:12px;
+  border-radius:50%;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>HEERA STORE</h1>
+<p>The House Of Readymade</p>
+</header>
+
+<div class="filters">
+<button onclick="filter('all')">All</button>
+<button onclick="filter('GIRLS WEAR')">Girls Wear</button>
+</div>
+
+<div class="grid" id="products"></div>
+
+<!-- CART ICON -->
+<div class="cart-icon" onclick="openCart()">
+🛒 <span class="cart-count" id="count">0</span>
+</div>
+
+<!-- CART MODAL -->
+<div class="modal" id="cartModal">
+<div class="modal-content">
+<h2>Cart</h2>
+<div id="cartItems"></div>
+<h3 id="total"></h3>
+
+<form action="https://formspree.io/f/mlgopkwk" method="POST" onsubmit="submitOrder(event)">
+<input type="hidden" name="order" id="orderData">
+
+<input required placeholder="Name" name="name"><br><br>
+<input required placeholder="Phone" name="phone"><br><br>
+<input required placeholder="Email" name="email"><br><br>
+<textarea required placeholder="Address" name="address"></textarea><br><br>
+<textarea placeholder="Instructions" name="note"></textarea><br><br>
+
+<button type="submit">Place Order</button>
+</form>
+
+<button onclick="closeCart()">Close</button>
+</div>
+</div>
+
+<a class="whatsapp" href="https://wa.me/9993563240">💬</a>
+
+<script>
+const products=[
+{
+name:"Fancy Top (Set of 4)",
+price:230,
+cat:"GIRLS WEAR",
+img:"https://i.ibb.co/N67bjwws/Whats-App-Image-2026-04-02-at-17-13-23.jpg",
+desc:"Premium Girls Wear Top"
+}
+];
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+function renderProducts(list){
+let html="";
+list.forEach((p,i)=>{
+html+=`
+<div class="card">
+<img src="${p.img}" loading="lazy">
+<div class="info">
+<h3>${p.name}</h3>
+<p>${p.desc}</p>
+<p class="price">₹${p.price}</p>
+<button class="add-btn" onclick="addToCart(${i})">Add</button>
+</div>
+</div>`;
+});
+document.getElementById("products").innerHTML=html;
+}
+
+function filter(cat){
+if(cat==="all") renderProducts(products);
+else renderProducts(products.filter(p=>p.cat===cat));
+}
+
+function addToCart(i){
+let item=cart.find(x=>x.name===products[i].name);
+if(item) item.qty++;
+else cart.push({...products[i],qty:1});
+updateCart();
+}
+
+function updateCart(){
+localStorage.setItem("cart",JSON.stringify(cart));
+document.getElementById("count").innerText=cart.length;
+
+let html="",total=0;
+cart.forEach((item,i)=>{
+let sub=item.price*item.qty;
+total+=sub;
+html+=`
+<div>
+${item.name} x${item.qty} = ₹${sub}
+<button onclick="changeQty(${i},1)">+</button>
+<button onclick="changeQty(${i},-1)">-</button>
+<button onclick="removeItem(${i})">X</button>
+</div>`;
+});
+
+document.getElementById("cartItems").innerHTML=html;
+document.getElementById("total").innerText="Total: ₹"+total;
+
+document.getElementById("orderData").value=
+cart.map(i=>`${i.name} x${i.qty} = ₹${i.price*i.qty}`).join("\n")+
+"\nTotal: ₹"+total;
+}
+
+function changeQty(i,val){
+cart[i].qty+=val;
+if(cart[i].qty<=0) cart.splice(i,1);
+updateCart();
+}
+
+function removeItem(i){
+cart.splice(i,1);
+updateCart();
+}
+
+function openCart(){
+document.getElementById("cartModal").style.display="flex";
+updateCart();
+}
+
+function closeCart(){
+document.getElementById("cartModal").style.display="none";
+}
+
+function submitOrder(e){
+setTimeout(()=>{
+alert("Order placed! Heera Store will contact you on WhatsApp.");
+cart=[];
+updateCart();
+closeCart();
+},500);
+}
+
+renderProducts(products);
+updateCart();
+</script>
+
+</body>
+</html>
