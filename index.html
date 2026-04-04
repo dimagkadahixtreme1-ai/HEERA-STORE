@@ -31,16 +31,35 @@ header p{font-size:14px}
   gap:10px;
   padding:10px;
 }
+.add-btn,
 .filters button{
   padding:8px 15px;
   border:none;
-  border-radius:20px;
+  border-radius:8px;
   background:#00c853;
   color:#000;
   cursor:pointer;
+
+  /* 3D look */
+  box-shadow: 0 5px 0 #0a8f3c, 0 8px 10px rgba(0,0,0,0.4);
+
+  transition: all 0.1s ease;
 }
 
-  .filters button{
+/* PRESS EFFECT */
+.add-btn:active,
+.filters button:active{
+  transform: translateY(5px);
+  box-shadow: 0 1px 0 #0a8f3c, 0 3px 5px rgba(0,0,0,0.4);
+}
+
+/* HOVER (optional but good) */
+.add-btn:hover,
+.filters button:hover{
+  filter: brightness(1.1);
+}
+
+.filters button{
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   box-shadow: 0 4px 0 #0a8f3c;
 }
