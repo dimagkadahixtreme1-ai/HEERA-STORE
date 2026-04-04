@@ -318,22 +318,39 @@ document.getElementById("cartModal").style.display="none";
 }
 
 function submitOrder(e){
-e.preventDefault();
 
 // Empty cart check
 if(cart.length===0){
 alert("Cart is empty!");
+e.preventDefault();
 return;
 }
 
+// Order message ready (IMPORTANT)
+let total=0;
+cart.forEach(i=> total += i.price*i.qty);
+
+document.getElementById("orderData").value =
+"--- HEERA STORE ORDER ---\n\n" +
+cart.map(i=>`
+Product: ${i.name}
+Qty: ${i.qty}
+Price: ₹${i.price}
+Total: ₹${i.price*i.qty}
+Image: ${i.img}
+`).join("\n------------------\n") +
+"\nGrand Total: ₹"+total;
+
+// Form ko submit hone do (NO preventDefault here)
+
+// After submit (delay)
 setTimeout(()=>{
 alert("Order placed! Heera Store will contact you on WhatsApp.");
 cart=[];
 updateCart();
 closeCart();
-},500);
+},1000);
 }
-
 renderProducts(products);
 updateCart();
 </script>
