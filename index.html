@@ -68,12 +68,14 @@ header p{font-size:14px}
   object-fit:contain;
   background:#000;
 }
+ 
   .card{
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover{
   transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,255,100,0.4);
 }
 
 .info{
